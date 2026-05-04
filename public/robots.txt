@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /manager/
+Disallow: /staff/
+Disallow: /kuchnia
+Disallow: /kierowca
+Disallow: /kelner
+Disallow: /install
+Disallow: /checkout
+Disallow: /konto/
+Disallow: /payment/
+Disallow: /login
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /landlord/
+
+Sitemap: https://roveto.pl/sitemap.xml

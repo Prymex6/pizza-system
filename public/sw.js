@@ -1,0 +1,95 @@
+const CACHE_NAME = 'pizza-app-v3';
+const STATIC_ASSETS = [
+  '/manifest.json',
+  '/offline.html',
+];
+
+// Install – cache static assets
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
+  );
+  self.skipWaiting();
+});
+
+// Activate – clean old caches
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+    )
+  );
+  self.clients.claim();
+});
+
+// Fetch – network first, fallback to cache
+self.addEventListener('fetch', (event) => {
+  // Skip non-GET and non-http requests
+  if (event.request.method !== 'GET') return;
+  if (!event.request.url.startsWith('http')) return;
+
+  // Skip API / admin routes – always network
+  const url = new URL(event.request.url);
+  if (url.pathname.startsWith('/manager') ||
+      url.pathname.startsWith('/staff') ||
+      url.pathname.startsWith('/payment') ||
+      url.pathname.startsWith('/checkout')) {
+    return;
+  }
+
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        // Cache successful GET responses for static assets
+        if (response.ok && response.status !== 206 && response.type === 'basic') {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return response;
+      })
+      .catch(async () => {
+        // Try cache first, then serve offline page for navigation requests
+        const cached = await caches.match(event.request);
+        if (cached) return cached;
+        if (event.request.mode === 'navigate') {
+          return caches.match('/offline.html');
+        }
+        return new Response('', { status: 503, statusText: 'Service Unavailable' });
+      })
+  );
+});
+
+// Push notifications
+self.addEventListener('push', (event) => {
+  let data = { title: 'Nowe zamówienie', body: 'Sprawdź panel', url: '/staff/waiter' };
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch (e) {
+      data.body = event.data.text() || data.body;
+    }
+  }
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'Roveto', {
+      body: data.body || '',
+      icon: '/pwa-192x192.png',
+      badge: '/pwa-192x192.png',
+      tag: data.tag || 'roveto-notification',
+      data: { url: data.data?.url || data.url || '/staff/waiter' },
+    })
+  );
+});
+
+// Notification click
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url === url && 'focus' in client) return client.focus();
+      }
+      if (clients.openWindow) return clients.openWindow(url);
+    })
+  );
+});

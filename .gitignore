@@ -1,0 +1,54 @@
+# ── Laravel ───────────────────────────────────────────────────────
+*.log
+.env
+.env.backup
+.env.production
+.env.*.local
+/auth.json
+/storage/*.key
+/storage/pail
+/public/build
+/public/hot
+/public/storage
+/bootstrap/cache/*.php
+
+# ── Zależności ────────────────────────────────────────────────────
+/vendor
+/node_modules
+
+# ── Testy ─────────────────────────────────────────────────────────
+/tests
+/coverage
+.phpunit.result.cache
+/.phpunit.cache
+
+# ── Claude / AI ───────────────────────────────────────────────────
+/.claude
+
+# ── Bazy danych ───────────────────────────────────────────────────
+*.sqlite
+*.sqlite3
+
+# ── Backupy i storage tenantów ────────────────────────────────────
+/storage/backups
+/storage/tenants
+/public/tenants
+/public/uploads
+
+# ── IDE / edytory ─────────────────────────────────────────────────
+/.idea
+/.vscode
+/.fleet
+/.nova
+/.zed
+.DS_Store
+Thumbs.db
+.phpactor.json
+
+
+# ── Dokumentacja lokalna ──────────────────────────────────────────
+/docs
+
+# ── Pliki tymczasowe / lokalne ────────────────────────────────────
+/storage/menu_test_import.csv
+/public/apple-touch-icon copy.png
