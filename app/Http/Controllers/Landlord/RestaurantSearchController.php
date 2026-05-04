@@ -130,7 +130,7 @@ class RestaurantSearchController extends Controller
 
         // 1. Geocode city → lat/lng via Nominatim
         $geo = Http::withHeaders([
-                'User-Agent' => 'Roveto/1.0 (contact@roveto.pl)',
+                'User-Agent' => config('app.name', 'App') . '/1.0 (' . env('MAIL_FROM_ADDRESS', 'contact@example.com') . ')',
                 'Accept'     => 'application/json',
             ])
             ->timeout(10)
@@ -164,7 +164,7 @@ class RestaurantSearchController extends Controller
         $lastError = null;
         foreach ($endpoints as $url) {
             try {
-                $resp = Http::withHeaders(['User-Agent' => 'Roveto/1.0 (contact@roveto.pl)'])
+                $resp = Http::withHeaders(['User-Agent' => '{{ config('app.name', 'Roveto') }}/1.0 ({{ env('MAIL_FROM_ADDRESS', 'contact@example.com') }})'])
                     ->timeout(35)
                     ->asForm()
                     ->post($url, ['data' => $overpassQuery]);

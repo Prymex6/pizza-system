@@ -14,4 +14,4 @@ Disallow: /forgot-password
 Disallow: /reset-password
 Disallow: /landlord/
 
-Sitemap: https://roveto.pl/sitemap.xml
+Sitemap: /sitemap.xml
